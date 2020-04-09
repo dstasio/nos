@@ -1,0 +1,3 @@
+[submodule "env/vimconf"]
+	path = env/vimconf
+	url = https://github.com/dstasio/vimfiles
