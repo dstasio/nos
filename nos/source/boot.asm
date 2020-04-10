@@ -1,23 +1,23 @@
 [org 0x7c00]    ; Auto-correct all pointers
 mov ah, 0x0e    ; BIOS routine: scrolling teletype
 
-mov bp, 0x8000  ; Set a high base address for the stack
-mov sp, bp      ; Set top address of the stack
+mov bx, 50
+cmp bx, 4
+jle cond_le4
+cmp bx, 40
+jl  cond_l40
+mov al, 'C'
+jmp print
 
-push 'A'        ; Values are pushed as 16-bit, with the
-push 'B'        ; most significant byte set to 0.
-push 'C'
+cond_le4:
+    mov al, 'A'
+    jmp print
+cond_l40:
+    mov al, 'B'
+    jmp print
 
-pop bx          ; Pop 16-bits, use only low byte
-mov al, bl
-int 0x10        ; Print C
-
-pop bx
-mov al, bl
-int 0x10        ; Print B
-
-mov al, [0x7ffe] ; Stack grows downward, so address of A is bp-0x2 bytes
-int 0x10         ; Print A
+print:
+    int 0x10
 
 jmp $
 ; Padding and magic BIOS number
