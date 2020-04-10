@@ -1,25 +1,19 @@
-[org 0x7c00]    ; Auto-correct all pointers
-mov ah, 0x0e    ; BIOS routine: scrolling teletype
+[org 0x7c00]        ; Auto-correct all pointers
 
-mov bx, 50
-cmp bx, 4
-jle cond_le4
-cmp bx, 40
-jl  cond_l40
-mov al, 'C'
-jmp print
-
-cond_le4:
-    mov al, 'A'
-    jmp print
-cond_l40:
-    mov al, 'B'
-    jmp print
+mov bl, 'A'
+call print
+jmp end
 
 print:
+    pusha           ; Push all registers to the stack
+    mov ah, 0x0e    ; BIOS routine: scrolling teletype
+    mov al, bl      ; Load parameter from bl
     int 0x10
+    popa            ; Restore original register values
+    ret
 
-jmp $
-; Padding and magic BIOS number
+; Infinite loop, padding and magic BIOS number
+end:
+    jmp $
 times 510-($-$$) db 0
 dw 0xaa55
