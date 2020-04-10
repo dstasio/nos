@@ -1,27 +1,32 @@
-mov ah, 0x0e
-mov al, 'H'
+mov ah, 0x0e  ; BIOS routine: scrolling teletype
+
+; First attempt
+mov al, first
 int 0x10
-mov al, 'e'
+
+; Second attempt
+mov al, [second]
 int 0x10
-mov al, 'l'
+
+; Third attempt
+mov bx, third
+add bx, 0x7c00
+mov al, [bx]
 int 0x10
-int 0x10
-mov al, 'o'
-int 0x10
-mov al, ' '
-int 0x10
-mov al, 'P'
-int 0x10
-mov al, 'a'
-int 0x10
-mov al, 's'
-int 0x10
-mov al, 't'
-int 0x10
-mov al, 33
+
+; Fourth attempt
+mov al, [0x7c1e]
 int 0x10
 
 jmp $
 
+first:
+    db "X"
+second:
+    db "Y"
+third:
+    db "Z"
+
+; Padding and magic BIOS number
 times 510-($-$$) db 0
 dw 0xaa55
