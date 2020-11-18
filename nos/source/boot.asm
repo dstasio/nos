@@ -1,69 +1,43 @@
-mov ah, 0x0e
+[org 0x7c00]
 
+    mov [BOOT_DRIVE], dl  ; BIOS stores our boot drive in DL
+    
+    mov bp, 0x8000        ; setting stack out of the way
+    mov sp, bp
+    
+    mov bx, 0x9000        ; Load 5 sectors to 0x0000(ES):0x9000(BX)
+    mov dh, 5
+    mov dl, [BOOT_DRIVE]
+    call disk_load
 
-mov cx, 0x7c00+intro_str
-mov dx, intro_str_end-intro_str
-call print_string
+    mov bx, [0x9000]      ; Printing the first loaded word, expected to be 0xdada
+    call print_hex_16
 
-mov al, [secret_x]
-int 0x10
+    mov al, 10
+    call print_char
+    mov al, 13
+    call print_char
 
-mov bx, 0x7c0
-mov ds, bx
-mov al, [secret_y]
-int 0x10
+    mov bx, [0x9000 + 512] ; Also printing the first word from the 2nd sector
+                           ; expected to be 0xface
+    call print_hex_16
 
-mov al, [es:secret_z]
-int 0x10
+    jmp end
 
-mov bx, 0x7c0
-mov es, bx
-mov al, [es:secret_w]
-int 0x10
-
-mov cx, expected_str
-mov dx, expected_str_end-expected_str
-call print_string
-
-mov cx, hex_str
-mov dx, hex_str_end-hex_str
-call print_string
-
-mov bx, 0x12AF
-call print_hex_16
-
-jmp end
-
-
-intro_str:
-    db "Testing memory addressing: "
-intro_str_end:
-expected_str:
-    db 10
-    times 4 db 8
-    db "XYZW"
-    db 13
-    db "Expected:"
-    db 10
-    db 13
-expected_str_end:
-
-secret_x:
-    db "X"
-secret_y:
-    db "Y"
-secret_z:
-    db "Z"
-secret_w:
-    db "W"
-
-hex_str:
-    db "Hex printing: "
-hex_str_end:
-
+%include "../nos/source/disk_routines.asm"
 %include "../nos/source/print_routines.asm"
+
+; Global variables
+BOOT_DRIVE: db 0
 
 ; Infinite loop, padding and magic BIOS number
 end: jmp $
 times 510-($-$$) db 0
 dw 0xaa55
+
+; We know that BIOS will load only the first 512-byte sector from the disk,
+; so if we purposely add a few more sectors to our code by repeating some
+; familiar numbers , we can prove to ourselfs that we actually loaded those
+; additional two sectors from the disk we booted from.
+times 256 dw 0xdada
+times 256 dw 0xface
