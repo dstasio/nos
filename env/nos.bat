@@ -1,2 +1,2 @@
 @echo off
-bochs -f t:\env\bochsrc %*
+bochs -f x:\clean_os\env\bochsrc %*

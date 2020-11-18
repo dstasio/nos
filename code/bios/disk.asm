@@ -1,5 +1,5 @@
 ; load DH sectors to ES:BX from drive DL
-disk_load:
+bios_disk_load:
     push dx          ; Store DX on stack so later we can recall
                      ; how many sectors were request to be read,
                      ; even if it is altered in the meantime
@@ -10,15 +10,15 @@ disk_load:
     mov cl, 0x02     ; Start reading from second sector (i.e.
                                                      ; after the boot sector)
     int 0x13         ; BIOS interrupt
-    jc disk_error    ; Jump if error (i.e. carry flag set)
+    jc bios_disk_error    ; Jump if error (i.e. carry flag set)
     pop dx           ; Restore DX from the stack
     cmp dh, al       ; if AL (sectors read) != DH (sectors expected)
-    jne disk_error   ; display error message
+    jne bios_disk_error   ; display error message
     ret
 
-disk_error :
+bios_disk_error :
     mov bx, DISK_ERROR_MSG
-    call print_string
+    call bios_print_string
     jmp $
 
 ; Variables

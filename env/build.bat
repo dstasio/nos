@@ -1,7 +1,7 @@
 @echo off
 
-IF NOT EXIST ..\..\build mkdir ..\..\build
-pushd ..\..\build
-nasm -fbin ..\nos\source\boot.asm -o boot.bin
+IF NOT EXIST ..\build mkdir ..\build
+REM pushd ..\build
+nasm -fbin ..\code\boot.asm -o ..\build\boot.bin
 
-popd
+REM popd

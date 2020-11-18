@@ -8,24 +8,24 @@
     mov bx, 0x9000        ; Load 5 sectors to 0x0000(ES):0x9000(BX)
     mov dh, 5
     mov dl, [BOOT_DRIVE]
-    call disk_load
+    call bios_disk_load
 
     mov bx, [0x9000]      ; Printing the first loaded word, expected to be 0xdada
-    call print_hex_16
+    call bios_print_hex_16
 
     mov al, 10
-    call print_char
+    call bios_print_char
     mov al, 13
-    call print_char
+    call bios_print_char
 
     mov bx, [0x9000 + 512] ; Also printing the first word from the 2nd sector
                            ; expected to be 0xface
-    call print_hex_16
+    call bios_print_hex_16
 
     jmp end
 
-%include "../nos/source/disk_routines.asm"
-%include "../nos/source/print_routines.asm"
+%include "bios/disk.asm"
+%include "bios/print.asm"
 
 ; Global variables
 BOOT_DRIVE: db 0
